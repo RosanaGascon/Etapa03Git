@@ -4,32 +4,73 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Productos</title>
+  <!-- Agregar enlace a Bootstrap desde CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
 </head>
 <body>
-  <h1>Lista de Productos</h1>
-  <div id="productos-lista"></div>
 
-  <h2>Agregar un nuevo producto</h2>
-  <form id="formAgregarProducto">
-    <label for="nombre">Nombre:</label>
-    <input type="text" id="nombre" required>
-    <br>
-    
-    <label for="descripcion">Descripción:</label>
-    <input type="text" id="descripcion" required>
-    <br>
-    
-    <label for="precio">Precio:</label>
-    <input type="number" id="precio" required>
-    <br>
-    
-    <button type="submit">Agregar Producto</button>
-  </form>
+  <div class="container mt-5">
+    <h1 class="text-center mb-4">Lista de Productos</h1>
 
-  <h3>Carrito</h3>
-  <ul id="carrito-lista"></ul>
-  <button onclick="vaciarCarrito()">Vaciar Carrito</button>
+    <!-- Lista de productos -->
+    <div id="productos-lista" class="row"></div>
 
+    <hr class="my-5">
+
+    <h2 class="text-center mb-4">Agregar un nuevo producto</h2>
+
+    <!-- Formulario de nuevo producto -->
+    <form id="formAgregarProducto" class="col-md-6 mx-auto mb-5">
+      <div class="mb-3">
+        <label for="nombre" class="form-label">Nombre</label>
+        <input type="text" id="nombre" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="descripcion" class="form-label">Descripción</label>
+        <input type="text" id="descripcion" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="precio" class="form-label">Precio</label>
+        <input type="number" id="precio" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="stock" class="form-label">Stock</label>
+        <input type="number" id="stock" class="form-control" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Agregar Producto</button>
+    </form>
+  </div>
+
+  <!-- Carrito (Botón para abrir el modal) en la esquina superior derecha -->
+  <button class="btn btn-info position-fixed top-0 end-0 m-4" data-bs-toggle="modal" data-bs-target="#carritoModal">
+    Ver Carrito
+  </button>
+
+  <!-- Modal para el Carrito -->
+  <div class="modal fade" id="carritoModal" tabindex="-1" aria-labelledby="carritoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="carritoModalLabel">Carrito de Compras</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <ul id="carrito-lista" class="list-group"></ul>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" onclick="vaciarCarrito()">Vaciar Carrito</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agregar scripts de Bootstrap y tu script personalizado -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     // Obtener productos desde el servidor
     fetch('http://localhost:3000/api/productos')
@@ -38,11 +79,17 @@
         const productosLista = document.getElementById('productos-lista');
         data.forEach(producto => {
           const productoDiv = document.createElement('div');
+          productoDiv.classList.add('col-md-4', 'mb-4');
           productoDiv.innerHTML = `
-            <h3>${producto.nombre}</h3>
-            <p>${producto.descripcion}</p>
-            <p>Precio: $${producto.precio}</p>
-            <button onclick="agregarAlCarrito('${producto._id}', '${producto.nombre}', ${producto.precio})">Agregar al carrito</button>
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">${producto.nombre}</h5>
+                <p class="card-text">${producto.descripcion}</p>
+                <p class="card-text"><strong>Precio:</strong> $${producto.precio}</p>
+                <p class="card-text"><strong>Stock:</strong> ${producto.stock}</p>
+                <button onclick="agregarAlCarrito('${producto._id}', '${producto.nombre}', ${producto.precio})" class="btn btn-success">Agregar al carrito</button>
+              </div>
+            </div>
           `;
           productosLista.appendChild(productoDiv);
         });
@@ -61,6 +108,7 @@
       carritoLista.innerHTML = '';
       carrito.forEach(item => {
         const itemLi = document.createElement('li');
+        itemLi.classList.add('list-group-item');
         itemLi.innerHTML = `${item.nombre} - $${item.precio} x ${item.cantidad}`;
         carritoLista.appendChild(itemLi);
       });
@@ -87,36 +135,50 @@
       const nombre = document.getElementById('nombre').value;
       const descripcion = document.getElementById('descripcion').value;
       const precio = parseFloat(document.getElementById('precio').value);
+      const stock = parseInt(document.getElementById('stock').value);
 
-      const producto = { nombre, descripcion, precio };
+      const producto = { nombre, descripcion, precio, stock };
 
-      // Enviar el producto al backend
-      fetch('http://localhost:3000/api/productos', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(producto)
-      })
-      .then(response => response.json())
-      .then(data => {
-        alert('Producto agregado correctamente');
-        // Aquí podemos agregar el nuevo producto a la lista visible sin tener que recargar
-        const productosLista = document.getElementById('productos-lista');
-        const productoDiv = document.createElement('div');
-        productoDiv.innerHTML = `
-          <h3>${data.nombre}</h3>
-          <p>${data.descripcion}</p>
-          <p>Precio: $${data.precio}</p>
-          <button onclick="agregarAlCarrito('${data._id}', '${data.nombre}', ${data.precio})">Agregar al carrito</button>
-        `;
-        productosLista.appendChild(productoDiv);
-      })
-      .catch(error => {
-        console.error('Error al agregar producto:', error);
-        alert('Error al agregar el producto');
-      });
+      // Verificar que los datos sean válidos antes de enviarlos al backend
+      if (nombre && descripcion && !isNaN(precio) && precio > 0 && !isNaN(stock) && stock >= 0) {
+        fetch('http://localhost:3000/api/productos', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(producto)
+        })
+        .then(response => response.json())
+        .then(data => {
+          alert('Producto agregado correctamente');
+          console.log(data); // Verifica la respuesta del backend
+
+          // Agregar el nuevo producto a la lista sin tener que recargar la página
+          const productosLista = document.getElementById('productos-lista');
+          const productoDiv = document.createElement('div');
+          productoDiv.classList.add('col-md-4', 'mb-4');
+          productoDiv.innerHTML = `
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">${data.nombre}</h5>
+                <p class="card-text">${data.descripcion}</p>
+                <p class="card-text"><strong>Precio:</strong> $${data.precio}</p>
+                <p class="card-text"><strong>Stock:</strong> ${data.stock}</p>
+                <button onclick="agregarAlCarrito('${data._id}', '${data.nombre}', ${data.precio})" class="btn btn-success">Agregar al carrito</button>
+              </div>
+            </div>
+          `;
+          productosLista.appendChild(productoDiv);
+        })
+        .catch(error => {
+          console.error('Error al agregar producto:', error);
+          alert('Error al agregar el producto');
+        });
+      } else {
+        alert('Por favor, complete todos los campos correctamente.');
+      }
     });
   </script>
+
 </body>
 </html>

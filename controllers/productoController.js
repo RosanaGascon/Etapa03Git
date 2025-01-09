@@ -12,22 +12,27 @@ exports.getProductos = async (req, res) => {
 
 // Agregar un nuevo producto
 exports.createProducto = async (req, res) => {
-  const { nombre, descripcion, precio } = req.body;
+  const { nombre, descripcion, precio, stock } = req.body;
+
+  // Verificar si el stock es válido
+  if (stock === undefined || stock < 0) {
+    return res.status(400).json({ message: 'Stock debe ser un número válido.' });
+  }
 
   const producto = new Producto({
     nombre,
     descripcion,
     precio,
+    stock,
   });
 
   try {
-    const nuevoProducto = await producto.save();  // Este código guarda el producto en MongoDB
+    const nuevoProducto = await producto.save();
     res.status(201).json(nuevoProducto);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
-
 
 // Ruta para procesar el carrito de compras
 exports.procesarCarrito = async (req, res) => {
