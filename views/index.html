@@ -10,8 +10,14 @@
 <body>
 
   <div class="container mt-5">
-    <h1 class="text-center mb-4">Lista de Productos</h1>
-
+    <div class="container mt-5 d-flex justify-content-between">
+      <h1 class="h4 mb-0">Tienda de Productos</h1>
+      <!-- Carrito (Botón para abrir el modal) en la esquina superior derecha -->
+      <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#carritoModal">
+        Ver Carrito
+      </button>
+    </div>
+    <hr class="my-5">
     <!-- Lista de productos -->
     <div id="productos-lista" class="row"></div>
 
@@ -44,11 +50,6 @@
       <button type="submit" class="btn btn-primary">Agregar Producto</button>
     </form>
   </div>
-
-  <!-- Carrito (Botón para abrir el modal) en la esquina superior derecha -->
-  <button class="btn btn-info position-fixed top-0 end-0 m-4" data-bs-toggle="modal" data-bs-target="#carritoModal">
-    Ver Carrito
-  </button>
 
   <!-- Modal para el Carrito -->
   <div class="modal fade" id="carritoModal" tabindex="-1" aria-labelledby="carritoModalLabel" aria-hidden="true">
