@@ -34,6 +34,22 @@ exports.createProducto = async (req, res) => {
   }
 };
 
+// Eliminar un producto por su ID
+exports.deleteProducto = async (req, res) => {
+  try {
+    const productoId = req.params.id;
+    const productoEliminado = await Producto.findByIdAndDelete(productoId);
+
+    if (!productoEliminado) {
+      return res.status(404).json({ error: 'Producto no encontrado' });
+    }
+
+    res.status(200).json({ message: 'Producto eliminado con éxito' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al eliminar el producto' });
+  }
+};
+
 // Ruta para procesar el carrito de compras
 exports.procesarCarrito = async (req, res) => {
   const carrito = req.body;

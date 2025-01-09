@@ -89,6 +89,7 @@
                 <p class="card-text"><strong>Precio:</strong> $${producto.precio}</p>
                 <p class="card-text"><strong>Stock:</strong> ${producto.stock}</p>
                 <button onclick="agregarAlCarrito('${producto._id}', '${producto.nombre}', ${producto.precio})" class="btn btn-success">Agregar al carrito</button>
+                <button onclick="eliminarProducto('${producto._id}')" class="btn btn-danger mt-2">Eliminar producto</button>
               </div>
             </div>
           `;
@@ -129,6 +130,32 @@
       });
     }
 
+    // Función para eliminar un producto
+    function eliminarProducto(productoId) {
+      fetch(`http://localhost:3000/api/productos/${productoId}`, {
+        method: 'DELETE',
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error al eliminar el producto');
+        }
+        return response.json();
+      })
+      .then(data => {
+        alert(data.message); // Mensaje de éxito
+        // Eliminar el producto de la vista sin necesidad de recargar la página
+        location.reload(); // Recarga la página después de eliminar el producto
+        const productoDiv = document.getElementById(productoId);
+        if (productoDiv) {
+          productoDiv.remove();
+        }
+      })
+      .catch(error => {
+        alert('Error al eliminar el producto: ' + error.message);
+        console.error(error);
+      });
+    }
+
     // Función para agregar un producto
     document.getElementById('formAgregarProducto').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -166,6 +193,7 @@
                 <p class="card-text"><strong>Precio:</strong> $${data.precio}</p>
                 <p class="card-text"><strong>Stock:</strong> ${data.stock}</p>
                 <button onclick="agregarAlCarrito('${data._id}', '${data.nombre}', ${data.precio})" class="btn btn-success">Agregar al carrito</button>
+                <button onclick="eliminarProducto('${data._id}')" class="btn btn-danger mt-2">Eliminar producto</button>
               </div>
             </div>
           `;
